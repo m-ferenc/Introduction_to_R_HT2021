@@ -1,0 +1,41 @@
+---
+title: "Brief report on NAFLD patients"
+author: "Ferenc Mozes"
+date: "17/01/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+nafldDataset <- read.csv("nafld_dataset2.csv")
+library(ggplot2)
+library(knitr)
+library(markdown)
+```
+
+The subset of NAFLD patient data used in this analysis:
+
+```{r table, echo=FALSE}
+knitr::kable(nafldDataset[c("alt", "ast", "tg", "bmi", "lsm", "probe")], 
+             format="markdown", 
+             col.names=c("ALT (IU/l)", "AST (IU/l)", "TG (mg/dl)", "BMI (kg/m2)", "LSM (kPa)","Probe type"),
+             align="cccccc")
+```
+
+
+```{r corr}
+cor.test(nafldDataset$bmi[!is.na(nafldDataset$bmi) & !is.na(nafldDataset$tg)], 
+    nafldDataset$tg[!is.na(nafldDataset$bmi) & !is.na(nafldDataset$tg)])
+```
+
+
+```{r lm}
+regressionRes <- lm(ast~alt, data=nafldDataset)
+summary(regressionRes)
+```
+
+
+
+```{r lm_fig, fig.cap = "The relationship between AST and ALT in morbidly obese patients with NAFLD"}
+ggplot(nafldDataset, aes(x=alt, y=ast)) + geom_point() + geom_smooth(method=lm)
+```
